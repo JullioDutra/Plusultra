@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Plus Ultra — A Origem de Deku</title>
+<title>Plus Ultra</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
 <style>
@@ -24,7 +24,7 @@ canvas#c{position:fixed;inset:0;display:block}
 
 /* HUD */
 #hud{position:absolute;inset:0}
-#hudL{position:absolute;left:16px;top:14px;display:flex;gap:10px;align-items:center}
+#hudL{position:absolute;left:calc(16px + env(safe-area-inset-left,0px));top:calc(14px + env(safe-area-inset-top,0px));display:flex;gap:10px;align-items:center}
 #portrait{width:58px;height:58px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#3a8a5a,#16331f);border:3px solid #fff;box-shadow:0 0 0 3px var(--ink);display:grid;place-items:center;font-size:22px;color:#fff}
 .bars{display:flex;flex-direction:column;gap:5px}
 #hpbar{width:min(300px,52vw);height:16px;background:#2a0e12;border:2px solid #fff;box-shadow:0 0 0 2px var(--ink);transform:skewX(-14deg);position:relative;overflow:hidden}
@@ -121,9 +121,9 @@ canvas#c{position:fixed;inset:0;display:block}
 
 /* toque */
 #touch{position:absolute;inset:0;pointer-events:none}
-#tstick{position:absolute;left:22px;bottom:26px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);pointer-events:auto}
+#tstick{position:absolute;left:calc(22px + env(safe-area-inset-left,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);pointer-events:auto}
 #tknob{position:absolute;left:40px;top:40px;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.35)}
-#tbtns{position:absolute;right:16px;bottom:20px;display:grid;grid-template-columns:repeat(3,62px);gap:10px;pointer-events:auto}
+#tbtns{position:absolute;right:calc(16px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(3,62px);gap:10px;pointer-events:auto}
 #tbtns div{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.3);display:grid;place-items:center;font-size:12px;font-family:'Bangers';letter-spacing:.05em}
 #tbtns div:active{background:rgba(61,220,132,.5)}
 #tpause{position:absolute;top:12px;right:50%;transform:translateX(50%);pointer-events:auto;font-size:12px;padding:4px 10px;background:var(--panel);border-radius:4px;margin-top:64px}
