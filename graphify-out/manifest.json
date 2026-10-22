@@ -1,0 +1,98 @@
+{
+  "package.json": {
+    "mtime": 1792693772.7901697,
+    "seen": 1792696883.695812,
+    "ast_hash": "60f92aa2603cf92bd507da2081e91ad9",
+    "semantic_hash": ""
+  },
+  "src/actors.js": {
+    "mtime": 1792696587.606567,
+    "seen": 1792696883.6958208,
+    "ast_hash": "a024af7540abf71f3a1a090d7ab70119",
+    "semantic_hash": ""
+  },
+  "src/anim.js": {
+    "mtime": 1792693945.334485,
+    "seen": 1792696883.6958811,
+    "ast_hash": "311300bf3f99220e8ee52b6d84ea1c96",
+    "semantic_hash": ""
+  },
+  "src/audio.js": {
+    "mtime": 1792694042.3224828,
+    "seen": 1792696883.6958861,
+    "ast_hash": "bce91bdff08f2c3725f4f711dfe32546",
+    "semantic_hash": ""
+  },
+  "src/env.js": {
+    "mtime": 1792696837.6200738,
+    "seen": 1792696883.6958888,
+    "ast_hash": "182bd00f1f2ba0abbe366c8092ce011e",
+    "semantic_hash": ""
+  },
+  "src/fx.js": {
+    "mtime": 1792693997.110484,
+    "seen": 1792696883.6958911,
+    "ast_hash": "20aab8b6868589f4c1afcbf99166f231",
+    "semantic_hash": ""
+  },
+  "src/game.js": {
+    "mtime": 1792696587.6073382,
+    "seen": 1792696883.695893,
+    "ast_hash": "c5ee4442d4a9c87b694465a35195d3ff",
+    "semantic_hash": ""
+  },
+  "src/input.js": {
+    "mtime": 1792694056.0704825,
+    "seen": 1792696883.6958945,
+    "ast_hash": "b238bd28d726e02afd33e62872548f19",
+    "semantic_hash": ""
+  },
+  "src/main.js": {
+    "mtime": 1792696260.9008677,
+    "seen": 1792696883.6958964,
+    "ast_hash": "d4862f94298cc3aad50bb73961131baf",
+    "semantic_hash": ""
+  },
+  "src/models.js": {
+    "mtime": 1792693902.358486,
+    "seen": 1792696883.695898,
+    "ast_hash": "fbfe596d7c748aeca98c01f1c6631d5e",
+    "semantic_hash": ""
+  },
+  "src/stages.js": {
+    "mtime": 1792696837.6190708,
+    "seen": 1792696883.6959002,
+    "ast_hash": "a9cf657e832c6c8a35bd0133a45d943a",
+    "semantic_hash": ""
+  },
+  "src/ui.js": {
+    "mtime": 1792694644.506469,
+    "seen": 1792696883.6959019,
+    "ast_hash": "3802df107a6a4610aae1ca025f1501dc",
+    "semantic_hash": ""
+  },
+  "vite.config.js": {
+    "mtime": 1792695113.7424583,
+    "seen": 1792696883.6959035,
+    "ast_hash": "4bc202f21108653a3c34d14a362b49e9",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1792696878.678418,
+    "seen": 1792696883.695905,
+    "ast_hash": "b84ff05dc46509d8db0bb9c036aa89b2",
+    "semantic_hash": ""
+  },
+  "docs/PESQUISA.md": {
+    "mtime": 1792696863.8944182,
+    "seen": 1792696883.6959069,
+    "ast_hash": "f8363220d8b5f5ca356d8f4a68db2436",
+    "semantic_hash": ""
+  },
+  "index.html": {
+    "mtime": 1792696837.6179276,
+    "seen": 1792696883.6959083,
+    "ast_hash": "c363905903b3ea1f2a2523b552ed536c",
+    "semantic_hash": ""
+  }
+}
