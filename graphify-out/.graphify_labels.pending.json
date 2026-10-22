@@ -1,0 +1,20 @@
+{
+  "0": "Game",
+  "1": "Player",
+  "2": "models.js",
+  "3": "actors.js",
+  "4": "Env",
+  "5": "UI",
+  "6": "main.js",
+  "7": "package.json",
+  "8": "Audio",
+  "9": "Plano da versão 2",
+  "10": "common.js",
+  "11": "FX",
+  "12": "Enemy",
+  "13": ".until",
+  "14": "fx.js",
+  "15": ".updateSystems",
+  "16": ".frame",
+  "17": ".setup"
+}

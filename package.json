@@ -1,0 +1,29 @@
+{
+  "name": "plusultra",
+  "version": "1.0.0",
+  "description": "Plus Ultra \u2014 fan game de My Hero Academia no estilo PS2 (Three.js)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JullioDutra/Plusultra.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JullioDutra/Plusultra/issues"
+  },
+  "homepage": "https://github.com/JullioDutra/Plusultra#readme",
+  "dependencies": {
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10",
+    "vite-plugin-singlefile": "^2.0.3"
+  },
+  "type": "module"
+}
