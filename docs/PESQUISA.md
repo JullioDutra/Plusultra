@@ -31,6 +31,17 @@ Deku nasce sem Individualidade num mundo onde 80% das pessoas têm uma. Ele rece
 | 7 | Shie Hassaikai (Ep. 64–77) | Labirinto subterrâneo com paredes que se movem (Remodelar) | Overhaul e os espinhos de chão; o Rebobinar da Eri permite 100%; a fusão com Chronostasis |
 | Final | Guerra Final | Ruínas de Jaku | Ondas de Decadência do Shigaraki; All For One; os vestígios (Nana Shimura e Yoichi); Deku estende a mão ao Tenko |
 
+### Arcos adicionados na versão 2
+
+| Fase | Arco (episódios) | Cenário | Momento-chave |
+|---|---|---|---|
+| Deku vs. Kacchan | Treino de Batalha (Ep. 6–7) | Prédio de concreto da U.A. | O apelido "Deku" ganha novo sentido com a Uraraka; o gancho de direita previsível do Bakugo; a manopla; o soco para cima |
+| Corrida de Obstáculos | Festival Esportivo (Ep. 16) | Pista com robôs, The Fall e campo minado | Deku vence sem poder, usando a explosão das minas para se lançar |
+| Deku vs. Todoroki | Festival Esportivo (Ep. 22–23) | Ringue de concreto do estádio | "É o SEU poder!"; Todoroki usa o fogo; Deku perde por ring-out |
+| Licença Provisória | Exame (Ep. 52–60) | Campo rochoso e zona de desastre | Shoot Style; alvos nos alunos; resgate avaliado pelo H.U.C.; Gang Orca como vilão do exame |
+| Deku vs. Kacchan II | Ep. 61 | Ground Beta à noite | Bakugo se culpa pela aposentadoria do All Might; os dois brigam e são suspensos |
+| Lady Nagant | Arco Deku Sombrio (Temporada 6) | Telhados na chuva | A sniper ex-heroína; a bomba que All For One implantou nela; a turma traz o Deku de volta |
+
 ## Mecânicas de jogos de referência, reimplementadas do zero
 
 Não copiamos código nem recursos de nenhum jogo. Os jogos de luta 3D de anime da era PS2 e os jogos de MHA (One's Justice, Ultra Rumble) serviram de referência de **design**:

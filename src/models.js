@@ -2,17 +2,28 @@
 import * as THREE from 'three';
 
 const grad = (() => {
-  const d = new Uint8Array([70, 150, 255]);
+  const d = new Uint8Array([140, 200, 255]); // sombra clara, estilo anime atual
   const t = new THREE.DataTexture(d, 3, 1, THREE.RedFormat);
   t.minFilter = t.magFilter = THREE.NearestFilter;
   t.needsUpdate = true;
   return t;
 })();
 
+// luz de recorte (rim light) compartilhada: cada cenário escolhe a cor
+export const RIM = { color: { value: new THREE.Color(0x9ad0ff) }, strength: { value: 0.55 } };
+function addRim(m) {
+  m.onBeforeCompile = (sh) => {
+    sh.uniforms.rimColor = RIM.color; sh.uniforms.rimStrength = RIM.strength;
+    sh.fragmentShader = 'uniform vec3 rimColor; uniform float rimStrength;\n' + sh.fragmentShader.replace('#include <opaque_fragment>',
+      'float rimK = pow(1.0 - clamp(dot(normal, normalize(vViewPosition)), 0.0, 1.0), 3.0);\n outgoingLight += rimColor * smoothstep(0.25, 0.6, rimK) * rimStrength;\n#include <opaque_fragment>');
+  };
+  m.customProgramCacheKey = () => 'rim';
+  return m;
+}
 const matCache = new Map();
 export function toon(color, extra = {}) {
   const key = color + JSON.stringify(extra);
-  if (!matCache.has(key)) matCache.set(key, new THREE.MeshToonMaterial({ color, gradientMap: grad, ...extra }));
+  if (!matCache.has(key)) matCache.set(key, addRim(new THREE.MeshToonMaterial({ color, gradientMap: grad, ...extra })));
   return matCache.get(key);
 }
 export const outlineMat = new THREE.MeshBasicMaterial({ color: 0x0b0b10, side: THREE.BackSide });
@@ -539,4 +550,154 @@ export function vestige(color = 0x9ad8ff) {
   return r;
 }
 
-export const CHARS = { deku, allMight, bakugo, uraraka, iida, todoroki, kirishima, tsuyu, eri, kota, thug, waterThug, hassaikai, nomu, stain, muscular, overhaul, shigaraki, allForOne };
+
+// ---------------- Personagens extras (v2) ----------------
+export function mineta() {
+  return humanoid({
+    colors: { skin: 0xf0c49a, top: 0x5a3a8a, bottom: 0x5a3a8a, sleeve: 0x5a3a8a, forearm: 0x5a3a8a, shoe: 0xe8d23a },
+    scale: 0.6, head: 1.3,
+    extra(r) { for (let i = 0; i < 6; i++) part(r.head, G.sph(0.09, 8), 0x6a2a8a, Math.cos(i) * 0.15, 0.2 + (i % 2) * 0.05, Math.sin(i) * 0.15 - 0.05, 0.015); eyes(r.head, 0x222222, { size: 0.06 }); },
+  });
+}
+export function aizawa() {
+  return humanoid({
+    colors: { skin: 0xe8c8a8, top: 0x1a1a1e, bottom: 0x1a1a1e, sleeve: 0x1a1a1e, forearm: 0x1a1a1e, shoe: 0x111111 },
+    leg: 1.06,
+    extra(r) {
+      spikes(r.head, 0x111111, { count: 22, r: 0.255, len: 0.28, thick: 0.06, minY: -0.5, seed: 120, droop: 0.8 });
+      const sc = part(r.torso, G.tor(0.28, 0.08), 0xd8d8d0, 0, 0.72, 0, 0.015); sc.rotation.x = Math.PI / 2;
+      part(r.head, G.box(0.36, 0.07, 0.06), 0xe8d23a, 0, 0.06, 0.22, 0.01);
+    },
+  });
+}
+export function kurogiri() {
+  const r = humanoid({
+    colors: { skin: 0x1a1030, top: 0x2a2a30, bottom: 0x2a2a30, sleeve: 0x2a2a30, forearm: 0x2a2a30, shoe: 0x111111 },
+    scale: 1.2, noFace: true,
+    extra(r) {
+      const m = new THREE.MeshBasicMaterial({ color: 0x5a2a9a, transparent: true, opacity: 0.75 });
+      for (let i = 0; i < 6; i++) { const b = new THREE.Mesh(G.sph(0.22 + (i % 3) * 0.06, 8), m); b.position.set(Math.cos(i) * 0.12, 0.05 + i * 0.05, Math.sin(i) * 0.12); r.head.add(b); }
+      for (const sx of [-1, 1]) part(r.head, G.box(0.1, 0.03, 0.02), 0xf0e060, sx * 0.08, 0.1, 0.24, 0);
+      part(r.torso, G.box(0.36, 0.14, 0.05), 0x8a8a90, 0, 0.72, 0.15, 0.01);
+    },
+  });
+  return r;
+}
+export function gangOrca() {
+  return humanoid({
+    colors: { skin: 0x1a1a22, top: 0xe8e8ee, bottom: 0x1a1a22, sleeve: 0xe8e8ee, forearm: 0x1a1a22, glove: 0x1a1a22, shoe: 0x111111 },
+    scale: 1.45, bulk: 1.5, chestScale: [1.15, 1, 1.1],
+    extra(r) {
+      const h = part(r.head, G.sph(0.27, 12), 0x14141c, 0, 0.02, 0.02, 0.02); h.scale.set(1, 1, 1.25);
+      for (const sx of [-1, 1]) part(r.head, G.sph(0.07, 8), 0xf0f0f0, sx * 0.14, 0.08, 0.2, 0);
+      part(r.head, G.box(0.26, 0.03, 0.03), 0xd8d8d8, 0, -0.1, 0.27, 0);
+      const fin = part(r.torso, G.cone(0.15, 0.6, 4), 0x14141c, 0, 0.8, -0.2, 0.02); fin.scale.z = 0.3; fin.rotation.x = -0.4;
+    },
+  });
+}
+export function ladyNagant() {
+  return humanoid({
+    colors: { skin: 0xe8d0c0, top: 0x2a3a6a, bottom: 0x2a3a6a, sleeve: 0x2a3a6a, forearm: 0x2a3a6a, glove: 0x8a90a0, shoe: 0x111111, shin: 0x2a3a6a },
+    leg: 1.12, scale: 1.05,
+    extra(r) {
+      spikes(r.head, 0x2a2a3a, { count: 16, r: 0.255, len: 0.3, thick: 0.065, minY: -0.6, seed: 140, droop: 0.9 });
+      for (let i = 0; i < 6; i++) part(r.head, G.sph(0.05, 6), [0xd85ab0, 0x5ac8e8][i % 2], -0.2 + i * 0.08, 0.2, -0.15, 0.01);
+      eyes(r.head, 0x6a2a8a, { size: 0.05 });
+      // braço-rifle
+      const gun = part(r.elR, G.cyl(0.045, 0.06, 0.9, 8), 0x50566a, 0, -0.55, 0, 0.015);
+      part(r.elR, G.box(0.1, 0.12, 0.2), 0x3a3e4a, 0, -0.2, 0, 0.01);
+      r.gun = gun;
+    },
+  });
+}
+export function inasa() {
+  return humanoid({
+    colors: { skin: 0xd8a882, top: 0xe8e4dc, bottom: 0x2a2a30, sleeve: 0xe8e4dc, forearm: 0xd8a882, shoe: 0x6a3a2a },
+    scale: 1.2, bulk: 1.25,
+    extra(r) {
+      const h = part(r.head, G.cone(0.3, 0.55, 8), 0x2a2a2a, 0, 0.35, -0.04, 0.02); h.rotation.x = -0.4;
+      eyes(r.head, 0x222222, { size: 0.06 });
+      part(r.torso, G.box(0.08, 0.5, 0.03), 0x8a1a1a, 0, 0.4, 0.15, 0);
+    },
+  });
+}
+export function civilian(v = 0) {
+  const pal = [[0xe8a83a, 0x3a4a8a], [0x8ad0e8, 0x4a3a3a], [0xd85a6a, 0x2a2a2a], [0x9ae8a0, 0x5a4a3a], [0xf0f0f0, 0x3a5a8a]][v % 5];
+  const hair = [0x2a1a10, 0x6a4a2a, 0x111111, 0xd8b06a, 0x8a3a1a][v % 5];
+  return humanoid({
+    colors: { skin: [0xf2cba5, 0xd8a882, 0xb88a64, 0xf6d8c0, 0xe8c09a][v % 5], top: pal[0], bottom: pal[1], sleeve: pal[0], shoe: 0x3a3a3a, hair },
+    scale: 0.92 + (v % 3) * 0.05,
+    extra(r) { spikes(r.head, hair, { count: 12, r: 0.25, len: 0.12, thick: 0.1, minY: 0.0, seed: 200 + v, droop: 0.5 }); eyes(r.head, 0x3a2a1a, { size: 0.055 }); },
+  });
+}
+export function student(color = 0x2a2a6a, v = 0) {
+  return humanoid({
+    colors: { skin: [0xf2cba5, 0xd8a882, 0xe8c09a][v % 3], top: color, bottom: color, sleeve: color, forearm: color, glove: 0xeeeeee, shoe: 0x222222, hair: [0x1a1a1a, 0x8a5a2a, 0xd8d8e8][v % 3] },
+    extra(r) {
+      spikes(r.head, [0x1a1a1a, 0x8a5a2a, 0xd8d8e8][v % 3], { count: 14, r: 0.25, len: 0.16, thick: 0.08, minY: 0, seed: 300 + v });
+      eyes(r.head, 0x2a2a2a, { size: 0.055, angry: true });
+      // alvos do exame da licença (3 por aluno)
+      const tm = new THREE.MeshBasicMaterial({ color: 0xff8a1a });
+      r.targets = [];
+      for (const [x, y, z] of [[0, 0.5, 0.15], [0.15, 0.3, 0.14], [-0.15, 0.3, 0.14]]) { const t = new THREE.Mesh(G.cyl(0.07, 0.07, 0.03, 10), tm); t.rotation.x = Math.PI / 2; t.position.set(x, y, z); r.torso.add(t); r.targets.push(t); }
+    },
+  });
+}
+
+// ---------------- Objetos de cenário ----------------
+export function car(color = 0xc8281e) {
+  const g = new THREE.Group();
+  part(g, G.box(1.9, 0.6, 4.2), color, 0, 0.55, 0, 0.04);
+  part(g, G.box(1.6, 0.55, 2.2), color, 0, 1.1, -0.2, 0.04);
+  part(g, G.box(1.62, 0.42, 2.0), 0x2a3a4a, 0, 1.1, -0.2, 0);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { const w = part(g, G.cyl(0.33, 0.33, 0.25, 10), 0x1a1a1a, sx * 0.9, 0.33, sz * 1.35, 0.02); w.rotation.z = Math.PI / 2; }
+  for (const sx of [-1, 1]) { const l = new THREE.Mesh(G.box(0.3, 0.12, 0.05), new THREE.MeshBasicMaterial({ color: 0xfff0c0 })); l.position.set(sx * 0.6, 0.6, 2.11); g.add(l); }
+  return g;
+}
+export function vending(color = 0xd8282e) {
+  const g = new THREE.Group();
+  part(g, G.box(0.9, 1.9, 0.7), color, 0, 0.95, 0, 0.03);
+  const front = new THREE.Mesh(G.box(0.7, 1.0, 0.02), new THREE.MeshBasicMaterial({ color: 0xe8f4ff }));
+  front.position.set(0, 1.2, 0.36); g.add(front);
+  for (let i = 0; i < 6; i++) { const c = new THREE.Mesh(G.box(0.08, 0.16, 0.03), new THREE.MeshBasicMaterial({ color: [0xff4a4a, 0x4aaaff, 0xffd23a][i % 3] })); c.position.set(-0.25 + (i % 3) * 0.25, 1.4 - Math.floor(i / 3) * 0.35, 0.38); g.add(c); }
+  return g;
+}
+export function barrier() {
+  const g = new THREE.Group();
+  part(g, G.box(2, 0.25, 0.12), 0xf0f0f0, 0, 0.8, 0, 0.02);
+  for (let i = 0; i < 3; i++) part(g, G.box(0.3, 0.26, 0.13), 0xd8281e, -0.6 + i * 0.6, 0.8, 0, 0);
+  for (const sx of [-1, 1]) part(g, G.box(0.1, 0.9, 0.1), 0x3a3a3a, sx * 0.85, 0.45, 0, 0.02);
+  return g;
+}
+export function cone() {
+  const g = new THREE.Group();
+  part(g, G.cone(0.2, 0.6, 10), 0xff7a1a, 0, 0.32, 0, 0.02);
+  part(g, G.box(0.45, 0.05, 0.45), 0x2a2a2a, 0, 0.02, 0, 0.01);
+  return g;
+}
+export function crate(color = 0x8a6a3a) {
+  const g = new THREE.Group();
+  part(g, G.box(1, 1, 1), color, 0, 0.5, 0, 0.03);
+  part(g, G.box(1.02, 0.12, 1.02), 0x5a4024, 0, 0.5, 0, 0);
+  return g;
+}
+export function notebook() {
+  const g = new THREE.Group();
+  const b = part(g, G.box(0.5, 0.06, 0.7), 0xe8d8a0, 0, 0, 0, 0.02);
+  const label = new THREE.Mesh(G.box(0.3, 0.07, 0.2), new THREE.MeshBasicMaterial({ color: 0x2c8a52 }));
+  label.position.set(0, 0.005, -0.1); g.add(label);
+  const glow = new THREE.Mesh(G.sph(0.55, 12), new THREE.MeshBasicMaterial({ color: 0x7dffb0, transparent: true, opacity: 0.18, depthWrite: false, blending: THREE.AdditiveBlending }));
+  g.add(glow);
+  void b;
+  return g;
+}
+export function mine() {
+  const g = new THREE.Group();
+  part(g, G.cyl(0.32, 0.36, 0.12, 12), 0x5a5a62, 0, 0.04, 0, 0.02);
+  const led = new THREE.Mesh(G.sph(0.07, 8), new THREE.MeshBasicMaterial({ color: 0xff5ac8 }));
+  led.position.y = 0.12; g.add(led);
+  g.userData.led = led;
+  return g;
+}
+
+export const CHARS = { deku, allMight, bakugo, uraraka, iida, todoroki, kirishima, tsuyu, eri, kota, thug, waterThug, hassaikai, nomu, stain, muscular, overhaul, shigaraki, allForOne, mineta, aizawa, kurogiri, gangOrca, ladyNagant, inasa, civilian, student };

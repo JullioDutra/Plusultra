@@ -2,9 +2,9 @@
 const KEYMAP = {
   up: ['KeyW', 'ArrowUp'], down: ['KeyS', 'ArrowDown'], left: ['KeyA', 'ArrowLeft'], right: ['KeyD', 'ArrowRight'],
   jump: ['Space'], attack: ['KeyJ', 'KeyZ'], smash: ['KeyK', 'KeyX'], dodge: ['KeyL', 'ShiftLeft', 'ShiftRight', 'KeyC'],
-  cowl: ['KeyQ'], special: ['KeyE', 'KeyV'], camL: ['KeyU', 'Comma'], camR: ['KeyO', 'Period'], pause: ['Escape', 'KeyP'], confirm: ['Enter', 'NumpadEnter'],
+  cowl: ['KeyQ'], special: ['KeyE', 'KeyV'], lock: ['Tab', 'KeyR'], camL: ['KeyU', 'Comma'], camR: ['KeyO', 'Period'], pause: ['Escape', 'KeyP'], confirm: ['Enter', 'NumpadEnter'],
 };
-const PAD = { jump: 0, dodge: 1, attack: 2, smash: 3, cowl: 4, special: 5, pause: 9, confirm: 0, up: 12, down: 13, left: 14, right: 15 };
+const PAD = { jump: 0, dodge: 1, attack: 2, smash: 3, cowl: 4, special: 5, lock: 11, pause: 9, confirm: 0, up: 12, down: 13, left: 14, right: 15 };
 
 export class Input {
   constructor() {
@@ -15,9 +15,10 @@ export class Input {
     this.cam = 0;
     this.touch = { x: 0, y: 0, btn: {} };
     this.anyPressed = false;
+    this.taps = new Set(); // toques rápidos (apertou e soltou no mesmo quadro) não se perdem
     addEventListener('keydown', e => {
-      if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
-      this.keys.add(e.code); this.anyPressed = true;
+      if (['Space', 'Tab', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) e.preventDefault();
+      this.keys.add(e.code); this.taps.add(e.code); this.anyPressed = true;
     });
     addEventListener('keyup', e => this.keys.delete(e.code));
     addEventListener('blur', () => this.keys.clear());
@@ -25,7 +26,8 @@ export class Input {
   poll() {
     this.prev = this.now;
     const n = {};
-    for (const a in KEYMAP) n[a] = KEYMAP[a].some(k => this.keys.has(k)) || !!this.touch.btn[a];
+    for (const a in KEYMAP) n[a] = KEYMAP[a].some(k => this.keys.has(k) || this.taps.has(k)) || !!this.touch.btn[a];
+    this.taps.clear();
     let ax = (n.right ? 1 : 0) - (n.left ? 1 : 0), ay = (n.down ? 1 : 0) - (n.up ? 1 : 0);
     let cam = (n.camR ? 1 : 0) - (n.camL ? 1 : 0);
     const pads = navigator.getGamepads ? navigator.getGamepads() : [];

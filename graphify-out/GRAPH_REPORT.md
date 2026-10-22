@@ -1,70 +1,88 @@
 # Graph Report - Plusultra  (2026-10-22)
 
 ## Corpus Check
-- 15 files · ~35,499 words
+- 23 files · ~53,558 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 1 file(s) not represented in the graph (top: (none) 1)
 
 ## Summary
-- 335 nodes · 697 edges · 10 communities (9 shown, 1 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 44 edges (avg confidence: 0.85)
+- 456 nodes · 1074 edges · 18 communities (12 shown, 6 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 64 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `8bf223f7`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Game
 - Player
 - models.js
-- game.js
+- actors.js
 - Env
 - UI
 - main.js
 - package.json
 - Audio
-- Pesquisa: My Hero Academia → fases do jogo
+- Plano da versão 2
+- common.js
+- FX
+- Enemy
+- fx.js
 
 ## God Nodes (most connected - your core abstractions)
-1. `Game` - 52 edges
-2. `Env` - 35 edges
-3. `UI` - 33 edges
-4. `Player` - 22 edges
-5. `humanoid()` - 22 edges
-6. `FX` - 17 edges
-7. `Enemy` - 16 edges
-8. `rnd()` - 15 edges
-9. `part()` - 13 edges
-10. `title()` - 12 edges
+1. `Game` - 63 edges
+2. `Env` - 44 edges
+3. `UI` - 41 edges
+4. `Player` - 33 edges
+5. `humanoid()` - 30 edges
+6. `part()` - 23 edges
+7. `rnd()` - 21 edges
+8. `Enemy` - 19 edges
+9. `FX` - 19 edges
+10. `title()` - 14 edges
 
 ## Surprising Connections (you probably didn't know these)
-- None detected - all connections are within the same source files.
+- `script()` --calls--> `bg()`  [EXTRACTED]
+  src/stages/ch1.js → src/stages/common.js
+- `script()` --calls--> `bigFinish()`  [EXTRACTED]
+  src/stages/ch1.js → src/stages/common.js
+- `script()` --calls--> `dropRock()`  [EXTRACTED]
+  src/stages/ch1.js → src/stages/common.js
+- `script()` --calls--> `ease()`  [EXTRACTED]
+  src/stages/ch1.js → src/stages/common.js
+- `script()` --calls--> `shot()`  [EXTRACTED]
+  src/stages/ch1.js → src/stages/common.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (10 total, 1 thin omitted)
-
-### Community 0 - "Game"
-Cohesion: 0.06
-Nodes (4): basicHas(), FX, mat(), Game
+## Communities (18 total, 6 thin omitted)
 
 ### Community 1 - "Player"
-Cohesion: 0.11
-Nodes (4): Actor, Enemy, Npc, Player
+Cohesion: 0.12
+Nodes (4): Actor, Npc, Player, Trail
 
 ### Community 2 - "models.js"
-Cohesion: 0.10
-Nodes (37): canvasTex(), groundTex(), texCache, windowsTex(), allForOne(), allMight(), bakugo(), CHARS (+29 more)
+Cohesion: 0.07
+Nodes (51): texCache, addRim(), aizawa(), allForOne(), allMight(), bakugo(), barrier(), car() (+43 more)
 
-### Community 3 - "game.js"
-Cohesion: 0.09
-Nodes (21): three, angLerp(), COMBO, ENEMIES, tmp, Animator, base(), J (+13 more)
+### Community 3 - "actors.js"
+Cohesion: 0.07
+Nodes (16): three, AIR, angLerp(), BUF_ACTIONS, COMBO, ENEMIES, STYLE_RANKS, tmp (+8 more)
 
 ### Community 4 - "Env"
-Cohesion: 0.25
-Nodes (3): Env, pick(), rnd()
+Cohesion: 0.22
+Nodes (6): canvasTex(), Env, groundTex(), pick(), rnd(), windowsTex()
+
+### Community 5 - "UI"
+Cohesion: 0.05
+Nodes (7): accentOf(), cache, init(), portrait(), SPEAKERS, STYLE_WORDS, UI
 
 ### Community 6 - "main.js"
-Cohesion: 0.12
-Nodes (23): Input, KEYMAP, PAD, audio, card(), controls(), credits(), game (+15 more)
+Cohesion: 0.11
+Nodes (27): Input, KEYMAP, PAD, audio, card(), chapters(), controls(), credits() (+19 more)
 
 ### Community 7 - "package.json"
 Cohesion: 0.08
@@ -74,27 +92,39 @@ Nodes (24): author, bugs, url, dependencies, three, description, devDependencies
 Cohesion: 0.20
 Nodes (5): Audio, HMIN, MAJ, MIN, TRACKS
 
-### Community 9 - "Pesquisa: My Hero Academia → fases do jogo"
-Cohesion: 0.18
-Nodes (9): A espinha dorsal da história, Arcos e cenários usados, Mecânicas de jogos de referência, reimplementadas do zero, Pesquisa: My Hero Academia → fases do jogo, Sobre as referências em vídeo, As fases, Como jogar, Estrutura do código (+1 more)
+### Community 9 - "Plano da versão 2"
+Cohesion: 0.10
+Nodes (17): A espinha dorsal da história, Arcos adicionados na versão 2, Arcos e cenários usados, Mecânicas de jogos de referência, reimplementadas do zero, Pesquisa: My Hero Academia → fases do jogo, Sobre as referências em vídeo, 1. Visual atual, 2. Interface atual (+9 more)
+
+### Community 10 - "common.js"
+Cohesion: 0.38
+Nodes (16): script(), script(), script(), script(), bg(), bigFinish(), BOSS, C (+8 more)
+
+### Community 11 - "FX"
+Cohesion: 0.17
+Nodes (3): FX, mat(), spriteMat()
+
+### Community 14 - "fx.js"
+Cohesion: 0.20
+Nodes (8): basic, basicHas(), boxGeo, discGeo, glowTex, planeGeo, ringGeo, spriteMats
 
 ## Knowledge Gaps
-- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **6 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Game` connect `Game` to `Player`, `game.js`, `main.js`?**
-  _High betweenness centrality (0.252) - this node is a cross-community bridge._
+- **Why does `Game` connect `Game` to `actors.js`, `main.js`, `FX`, `.until`, `.updateSystems`, `.frame`, `.setup`?**
+  _High betweenness centrality (0.227) - this node is a cross-community bridge._
 - **Should `Game` be split into smaller, more focused modules?**
-  _Cohesion score 0.05541346973572037 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.09846153846153846 - nodes in this community are weakly interconnected._
 - **Why does `UI` connect `UI` to `main.js`?**
-  _High betweenness centrality (0.171) - this node is a cross-community bridge._
+  _High betweenness centrality (0.156) - this node is a cross-community bridge._
 - **Should `Player` be split into smaller, more focused modules?**
-  _Cohesion score 0.113107822410148 - nodes in this community are weakly interconnected._
-- **Why does `three` connect `game.js` to `models.js`, `main.js`, `package.json`?**
-  _High betweenness centrality (0.158) - this node is a cross-community bridge._
+  _Cohesion score 0.11616161616161616 - nodes in this community are weakly interconnected._
+- **Why does `three` connect `actors.js` to `models.js`, `UI`, `main.js`, `package.json`, `common.js`, `fx.js`?**
+  _High betweenness centrality (0.132) - this node is a cross-community bridge._
 - **Should `models.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.09986504723346828 - nodes in this community are weakly interconnected._
-- **Should `game.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.08522727272727272 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07402031930333818 - nodes in this community are weakly interconnected._
+- **Should `actors.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.07112375533428165 - nodes in this community are weakly interconnected._

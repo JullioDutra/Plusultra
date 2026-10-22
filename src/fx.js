@@ -11,6 +11,60 @@ const mat = (color, opacity = 1, add = false) => {
   return basic.get(k);
 };
 
+// textura radial suave para brilhos
+const glowTex = (() => {
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const x = c.getContext('2d'), g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(255,255,255,0.8)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+})();
+const spriteMats = new Map();
+const spriteMat = (color) => {
+  if (!spriteMats.has(color)) spriteMats.set(color, new THREE.SpriteMaterial({ map: glowTex, color, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+  return spriteMats.get(color);
+};
+
+// rastro de golpe: fita que segue um ponto (mão/pé) e some aos poucos
+export class Trail {
+  constructor(scene, color = 0xffffff, n = 14, width = 0.35) {
+    this.n = n; this.w = width; this.pts = []; this.on = false;
+    const g = new THREE.BufferGeometry();
+    this.pos = new Float32Array(n * 2 * 3); this.alpha = new Float32Array(n * 2);
+    g.setAttribute('position', new THREE.BufferAttribute(this.pos, 3));
+    g.setAttribute('alpha', new THREE.BufferAttribute(this.alpha, 1));
+    const idx = [];
+    for (let i = 0; i < n - 1; i++) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+    g.setIndex(idx);
+    this.mat = new THREE.ShaderMaterial({
+      uniforms: { color: { value: new THREE.Color(color) } }, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+      vertexShader: 'attribute float alpha; varying float va; void main(){ va = alpha; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);} ',
+      fragmentShader: 'uniform vec3 color; varying float va; void main(){ gl_FragColor = vec4(color*1.6, va); }',
+    });
+    this.mesh = new THREE.Mesh(g, this.mat); this.mesh.frustumCulled = false;
+    scene.add(this.mesh);
+  }
+  setColor(c) { this.mat.uniforms.color.value.set(c); }
+  push(p, up) {
+    this.pts.unshift({ a: p.clone().addScaledVector(up, this.w), b: p.clone().addScaledVector(up, -this.w), life: 1 });
+    if (this.pts.length > this.n) this.pts.pop();
+  }
+  update(dt, src, up) {
+    if (this.on && src) this.push(src, up);
+    for (const q of this.pts) q.life -= dt * 5;
+    while (this.pts.length && this.pts[this.pts.length - 1].life <= 0) this.pts.pop();
+    for (let i = 0; i < this.n; i++) {
+      const q = this.pts[Math.min(i, this.pts.length - 1)];
+      if (!q) { this.alpha[i * 2] = this.alpha[i * 2 + 1] = 0; continue; }
+      this.pos.set([q.a.x, q.a.y, q.a.z, q.b.x, q.b.y, q.b.z], i * 6);
+      const k = i < this.pts.length ? Math.max(0, q.life) * (1 - i / this.n) * 0.85 : 0;
+      this.alpha[i * 2] = k; this.alpha[i * 2 + 1] = k * 0.3;
+    }
+    this.mesh.geometry.attributes.position.needsUpdate = true;
+    this.mesh.geometry.attributes.alpha.needsUpdate = true;
+  }
+}
+
 export class FX {
   constructor(scene) {
     this.scene = scene;
@@ -28,7 +82,14 @@ export class FX {
     this.weather = null;
   }
 
+  glow(pos, color, { vel, size = 0.5, life = 0.4, grav = 0 } = {}) {
+    const m = new THREE.Sprite(spriteMat(color));
+    m.position.copy(pos); m.scale.setScalar(size);
+    this.scene.add(m);
+    this.parts.push({ m, vel: vel || new THREE.Vector3(), life, max: life, grav, spin: 0, size, shrink: true, sprite: true });
+  }
   particle(pos, color, { vel, size = 0.15, life = 0.6, grav = -12, spin = 4, add = false, shrink = true } = {}) {
+    if (add) return this.glow(pos, color, { vel, size: size * 3, life, grav });
     let m = this.pool.pop();
     if (!m) { m = new THREE.Mesh(boxGeo, mat(color)); }
     m.material = mat(color, 1, add);
@@ -46,9 +107,24 @@ export class FX {
     }
   }
 
-  hitSpark(pos, big = false) {
-    this.burst(pos, [0xffffff, 0xfff0a0, 0xffc040], big ? 22 : 10, big ? 12 : 7, { size: big ? 0.2 : 0.12, life: 0.35, grav: 0, add: true });
-    this.flash(pos, big ? 1.6 : 0.8, 0xfff6c0, 0.12);
+  hitSpark(pos, big = false, color = 0xfff0a0) {
+    this.burst(pos, [0xffffff, color, 0xffc040], big ? 18 : 9, big ? 13 : 8, { size: big ? 0.16 : 0.1, life: 0.3, grav: 0, add: true });
+    this.glow(pos, 0xffffff, { size: big ? 3.2 : 1.6, life: 0.12 });
+    this.glow(pos, color, { size: big ? 5 : 2.4, life: 0.2 });
+    this.streaks(pos, big ? 10 : 5, big ? 2.4 : 1.4, color);
+  }
+  // faíscas em linha (estilo anime)
+  streaks(pos, n, len, color = 0xffffff) {
+    for (let i = 0; i < n; i++) {
+      const d = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.3, Math.random() - 0.5).normalize();
+      const m = new THREE.Mesh(planeGeo, mat(color, 0.95, true));
+      m.position.copy(pos).addScaledVector(d, len * 0.4);
+      m.lookAt(pos.clone().addScaledVector(d, 10));
+      m.rotateX(Math.PI / 2);
+      m.scale.set(0.06, len, 1);
+      this.scene.add(m);
+      this.items.push({ m, life: 0.16, max: 0.16, upd: (it, k) => { m.position.addScaledVector(d, 0.25); m.scale.set(0.06 * (1 - k), len * (1 - k * 0.5), 1); } });
+    }
   }
 
   flash(pos, r, color, life = 0.15) {
@@ -150,12 +226,13 @@ export class FX {
     for (let i = this.parts.length - 1; i >= 0; i--) {
       const q = this.parts[i];
       q.life -= dt;
-      if (q.life <= 0) { this.scene.remove(q.m); this.pool.push(q.m); this.parts.splice(i, 1); continue; }
+      if (q.life <= 0) { this.scene.remove(q.m); if (!q.sprite) this.pool.push(q.m); this.parts.splice(i, 1); continue; }
       q.vel.y += q.grav * dt;
       q.m.position.addScaledVector(q.vel, dt);
-      if (q.m.position.y < 0.02 && q.grav < 0) { q.m.position.y = 0.02; q.vel.multiplyScalar(0.5); q.vel.y *= -0.3; }
+      if (!q.sprite && q.m.position.y < (this.floorY ?? 0) + 0.02 && q.grav < 0) { q.m.position.y = (this.floorY ?? 0) + 0.02; q.vel.multiplyScalar(0.5); q.vel.y *= -0.3; }
       q.m.rotation.x += q.spin * dt; q.m.rotation.y += q.spin * dt;
-      if (q.shrink) q.m.scale.setScalar(q.size * (q.life / q.max));
+      if (q.sprite) { q.m.scale.setScalar(q.size * (q.life / q.max)); q.m.rotation.x = 0; q.m.rotation.y = 0; }
+      else if (q.shrink) q.m.scale.setScalar(q.size * (q.life / q.max));
     }
     for (let i = this.items.length - 1; i >= 0; i--) {
       const it = this.items[i];
@@ -187,7 +264,7 @@ export class FX {
   }
 
   clear() {
-    for (const q of this.parts) { this.scene.remove(q.m); this.pool.push(q.m); }
+    for (const q of this.parts) { this.scene.remove(q.m); if (!q.sprite) this.pool.push(q.m); }
     this.parts.length = 0;
     for (const it of this.items) this.scene.remove(it.m);
     this.items.length = 0;
